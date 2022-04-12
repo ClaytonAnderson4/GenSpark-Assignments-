@@ -41,7 +41,6 @@ public class Main {
 
     }
 
-
     public static ArrayList<Land> CreateBoard(){
         ArrayList<Land> worldBuffer = new ArrayList<>();
 
@@ -179,20 +178,40 @@ public class Main {
 
     }
 
+    public static char convertCase(char c){
 
-    public static void MovePlayer(){
-        Scanner sc = new Scanner(System.in);
-        System.out.print("What direction (n/s/e/w):");
-        char m = sc.next().charAt(0);
+        if(c<97){c+=32;}
 
-        switch (m){
-            case 'n': MoveNorth();
+        return c;
+    }
+
+    public static boolean CheckInput(char c){
+        return  ((c=='n')||(c=='s')||(c=='e')||(c=='w'));
+    }
+
+    public static void MovePlayer() {
+
+        char m;
+        do {
+            Scanner sc = new Scanner(System.in);
+            System.out.print("What direction (n/s/e/w):");
+            m = sc.next().charAt(0);
+            m= convertCase(m);
+        } while (!CheckInput(m));
+
+
+        switch (m) {
+            case 'n':
+                MoveNorth();
                 break;
-            case 's': MoveSouth();
+            case 's':
+                MoveSouth();
                 break;
-            case 'e':MoveEast();
+            case 'e':
+                MoveEast();
                 break;
-            case 'w': MoveWest();
+            case 'w':
+                MoveWest();
                 break;
         }
 
