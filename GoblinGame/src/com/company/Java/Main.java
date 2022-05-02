@@ -1,5 +1,9 @@
 package com.company.Java;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -10,30 +14,22 @@ public class Main {
     static ArrayList<Land> worldMap;
     static Humanoid player;
     static Humanoid goblin;
+    static JPanel displayPanel = new JPanel();
+    static JPanel actionPanel = new JPanel();
+    static JPanel buttonPanel = new JPanel();
+    static JLabel displayLabel = new JLabel();
+    static JLabel actionLabel = new JLabel();
 
+    static JButton[] buttons = new JButton[4];
 
     public static void main(String[] args) {
         boolean playing=true;
         worldMap = CreateBoard();
         CreatePeople();
         PrintBoard();
+        UI();
 
 
-        while (playing){
-
-
-            MovePlayer();
-            MoveGoblin();
-            PrintBoard();
-
-            if(player.getHealth()==0){
-                playing=false;
-                System.out.println("You Lost");
-            }else if(goblin.getHealth()==0){
-                playing=false;
-                System.out.println("You Won!");
-            }
-        }
 
 
 
@@ -52,8 +48,8 @@ public class Main {
 
 
 
-        System.out.println("Castle Index: " +castleIndex );
-        System.out.println("Goblin Camp Index: " + goblinCampIndex);
+   //     System.out.println("Castle Index: " +castleIndex );
+     //   System.out.println("Goblin Camp Index: " + goblinCampIndex);
 
         for(int i=0;i<worldSize;i++){
 
@@ -73,6 +69,92 @@ public class Main {
 
     }
 
+    public static void UI(){
+        JFrame window = new JFrame();
+        window.setSize(800,600);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.getContentPane().setBackground(Color.BLACK);
+        window.setResizable(false);
+        window.setTitle("Goblins");
+
+
+
+        displayLabel.setBounds(0,0,200,200);
+        displayLabel.setFont(new Font("Book Antiqua",Font.PLAIN,26));
+
+        displayPanel.add(displayLabel);
+        displayPanel.setBounds(50,50,700,200);
+
+
+
+
+        actionLabel.setBounds(0,0,200,200);
+        actionLabel.setFont(new Font("Book Antiqua",Font.PLAIN,26));
+
+        actionPanel.add(actionLabel);
+        actionPanel.setBounds(50,250,700,200);
+
+
+        buttons[0] = new JButton("North");
+        buttons[1] = new JButton("South");
+        buttons[2] = new JButton("East");
+        buttons[3] = new JButton("West");
+
+        SetListeners();
+
+        buttons[0].setBounds(50,0,100,100);
+        buttons[1].setBounds(200,0,100,100);
+        buttons[2].setBounds(350,0,150,100);
+        buttons[3].setBounds(500,0,100,100);
+
+        buttonPanel.add(buttons[0]);
+        buttonPanel.add(buttons[1]);
+        buttonPanel.add(buttons[2]);
+        buttonPanel.add(buttons[3]);
+
+        buttonPanel.setBounds(50,0,700,200);
+
+        window.add(actionPanel);
+        window.add(displayPanel);
+        window.add(buttonPanel);
+
+
+
+
+        window.setLocationRelativeTo(null);
+        window.setVisible(true);
+    }
+
+    public static void SetListeners(){
+        buttons[0].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MovePlayer(Directions.NORTH);
+            }
+        });
+
+        buttons[1].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MovePlayer(Directions.SOUTH);
+            }
+        });
+
+        buttons[2].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MovePlayer(Directions.EAST);
+            }
+        });
+
+        buttons[3].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MovePlayer(Directions.WEST);
+            }
+        });
+    }
+
     public static void PrintBoard(){
         String toPrint="";
         int counter = 0;
@@ -85,7 +167,10 @@ public class Main {
 
         }
 
-        System.out.println(toPrint);
+
+
+     //   System.out.println(toPrint);
+        displayLabel.setText("<html>" + toPrint.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>") + "</html>");
 
     }
 
@@ -146,19 +231,34 @@ public class Main {
             int goblinStr = goblin.getStrength();
             int goblinHp = goblin.getHealth();
 
+            String actionReport = "";
+
             while((playerHp>0)&&(goblinHp>0)){
                 int playerAtt = (int)Math.floor(Math.random()*playerStr+1);
                 int goblinAtt =(int)Math.floor(Math.random()*goblinStr+1);
 
                 playerHp-=goblinAtt;
                 goblinHp-=playerAtt;
-                System.out.println("Hero attacks for " + playerAtt +
-                                    " reducing the goblin's health to " + goblinHp);
 
-                System.out.println("Goblin attacks for " + goblinAtt +
-                        " reducing your health to " + playerHp);
+                actionReport+="Hero attacks for " + playerAtt +
+                        " reducing the goblin's health to " + goblinHp + "\n";
+
+           //     System.out.println("Hero attacks for " + playerAtt +
+           //                         " reducing the goblin's health to " + goblinHp);
+
+                actionReport+="Goblin attacks for " + goblinAtt +
+                        " reducing your health to " + playerHp+"\n";
+
+              //  System.out.println("Goblin attacks for " + goblinAtt +
+             //           " reducing your health to " + playerHp);
+
+
 
             }
+
+
+            actionLabel.setText("<html>" + actionReport.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>") + "</html>");
+
 
 
             if(goblinHp<=0){
@@ -176,6 +276,7 @@ public class Main {
 
         }
 
+
     }
 
     public static char convertCase(char c){
@@ -189,8 +290,8 @@ public class Main {
         return  ((c=='n')||(c=='s')||(c=='e')||(c=='w'));
     }
 
-    public static void MovePlayer() {
-
+    public static void MovePlayer(Directions direction) {
+/*
         char m;
         do {
             Scanner sc = new Scanner(System.in);
@@ -198,24 +299,36 @@ public class Main {
             m = sc.next().charAt(0);
             m= convertCase(m);
         } while (!CheckInput(m));
+*/
 
-
-        switch (m) {
-            case 'n':
+        switch (direction) {
+            case NORTH:
                 MoveNorth();
                 break;
-            case 's':
+            case SOUTH:
                 MoveSouth();
                 break;
-            case 'e':
+            case EAST:
                 MoveEast();
                 break;
-            case 'w':
+            case WEST:
                 MoveWest();
                 break;
         }
 
         CheckFight();
+        MoveGoblin();
+        PrintBoard();
+
+        if(player.getHealth()==0){
+            displayLabel.setText("You Lost");
+           buttonPanel.setVisible(false);
+           // System.out.println("You Lost");
+        }else if(goblin.getHealth()==0){
+            displayLabel.setText("You Won!");
+            buttonPanel.setVisible(false);
+           // System.out.println("You Won!");
+        }
     }
 
     public static void MoveNorth(){
